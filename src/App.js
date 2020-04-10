@@ -6,7 +6,7 @@ import "./styles.css";
 function App() {
   const [repositories, setRepositories] = useState([]);
   const [title, setTitle] = useState('');
-  const [urlRepo, setUrlRepo] = useState('');
+  const [url, setUrl] = useState('');
   const [techs, setTechs] = useState('');
 
   useEffect(() => {
@@ -19,8 +19,8 @@ function App() {
     // TODO
     const response = await api.post('repositories', {
       title,
-      urlRepo,
-      techs,
+      url,
+      techs: [],
     })
     const repo = response.data;
     setRepositories([...repositories, repo])
@@ -28,14 +28,13 @@ function App() {
 
   async function handleRemoveRepository(id) {
     // TODO
-    const response = await api.delete(`repositories/${id}`);
+    await api.delete(`repositories/${id}`);
 
-    if (response.status === 204) {
-      const repositoryIndex = repositories.findIndex(repo => repo.id !== id);
-      repositories.splice(repositoryIndex, 1);
-      setRepositories([...repositories])
-    }
+    const newRepositories = repositories.filter(
+      repository => repository.id !== id
+    )
 
+    setRepositories(newRepositories);
   }
 
   return (
@@ -47,8 +46,8 @@ function App() {
       />
       <input
         placeholder='url do repositorio'
-        value={urlRepo}
-        onChange={e => setUrlRepo(e.target.value)}
+        value={url}
+        onChange={e => setUrl(e.target.value)}
       />
       <input
         placeholder='tecnologias'
@@ -56,12 +55,12 @@ function App() {
         onChange={e => setTechs(e.target.value)}
       />
       <ul data-testid="repository-list">
-        {repositories.map(repo =>
-          <li key={repo.id}>
-            <p> {repo.title} </p>
-            <p>{repo.urlRepo}</p>
-            <p>{repo.techs}</p>
-            <button onClick={() => handleRemoveRepository(1)}>
+        {repositories.map(repository =>
+          <li key={repository.id}>
+            <p> {repository.title} </p>
+            <p>{repository.url}</p>
+            <p>{repository.techs}</p>
+            <button onClick={() => handleRemoveRepository(repository.id)}>
               Remover
           </button>
           </li>
